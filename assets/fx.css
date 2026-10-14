@@ -1,0 +1,115 @@
+/* ── 배경 효과: 민트·블루 오로라 / 떠다니는 빛 입자 / 마우스 조명 ──
+   fx.js가 레이어를 만들고, <html>에 .fx-on 클래스를 붙였을 때만 보입니다. */
+
+:root {
+  --fx-mint: 62, 214, 184;   /* 민트 */
+  --fx-blue: 35, 91, 236;    /* 사이트 기본 파랑(#235bec) */
+  --fx-sky: 86, 170, 255;    /* 하늘색 */
+}
+
+.fx-aurora,
+.fx-particles,
+.fx-spotlight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s ease;
+}
+
+/* 본문 뒤에 깔리는 레이어 */
+.fx-aurora,
+.fx-particles { z-index: -1; }
+
+.fx-on .fx-aurora,
+.fx-on .fx-particles { opacity: 1; }
+
+/* 오로라: 큰 원형 그라데이션 3개가 천천히 흘러다님 */
+.fx-aurora { overflow: hidden; }
+.fx-aurora i {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+.fx-aurora i:nth-child(1) {
+  top: -30vmax; left: -20vmax;
+  background: radial-gradient(closest-side, rgba(var(--fx-mint), .30), rgba(var(--fx-mint), 0));
+  animation: fx-drift-a 26s ease-in-out infinite alternate;
+}
+.fx-aurora i:nth-child(2) {
+  top: -25vmax; right: -25vmax;
+  background: radial-gradient(closest-side, rgba(var(--fx-blue), .20), rgba(var(--fx-blue), 0));
+  animation: fx-drift-b 32s ease-in-out infinite alternate;
+}
+.fx-aurora i:nth-child(3) {
+  bottom: -35vmax; left: 15vmax;
+  background: radial-gradient(closest-side, rgba(var(--fx-sky), .22), rgba(var(--fx-sky), 0));
+  animation: fx-drift-c 38s ease-in-out infinite alternate;
+}
+html:not(.fx-on) .fx-aurora i { animation-play-state: paused; }
+@keyframes fx-drift-a { to { transform: translate(28vw, 22vh) scale(1.15) rotate(25deg); } }
+@keyframes fx-drift-b { to { transform: translate(-30vw, 30vh) scale(.9) rotate(-20deg); } }
+@keyframes fx-drift-c { to { transform: translate(22vw, -28vh) scale(1.2) rotate(15deg); } }
+
+/* 마우스 조명: 본문 위에 아주 옅게 겹침 (글자 가독성 유지) */
+.fx-spotlight {
+  z-index: 25;
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    420px circle at var(--fx-x, 50%) var(--fx-y, 40%),
+    rgba(var(--fx-mint), .16),
+    rgba(var(--fx-blue), .07) 45%,
+    rgba(var(--fx-blue), 0) 70%
+  );
+}
+.fx-on.fx-pointer .fx-spotlight { opacity: 1; }
+
+/* 효과가 켜져 있을 때 넓은 띠 배경을 반투명하게 → 오로라가 비침 */
+.fx-on .intro-band       { background: rgba(243, 247, 252, .72); }
+.fx-on .skills-band      { background: rgba(244, 247, 252, .72); }
+.fx-on .credentials-band { background: rgba(248, 250, 253, .72); }
+.fx-on .automation-band  { background: rgba(255, 248, 239, .78); }
+
+/* 효과 켜기/끄기 버튼 */
+.fx-toggle {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px 9px 12px;
+  border: 1px solid var(--border, #dfe6ef);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--ink, #152333);
+  font: 600 13px/1.2 Pretendard, "Noto Sans KR", "Malgun Gothic", sans-serif;
+  box-shadow: 0 6px 20px rgba(21, 35, 51, .08);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.fx-toggle:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(21, 35, 51, .12); }
+.fx-toggle:focus-visible { outline: 2px solid var(--ring, #235bec); outline-offset: 3px; }
+.fx-toggle .fx-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #b7c2cf;
+  transition: background .3s ease, box-shadow .3s ease;
+}
+.fx-on .fx-toggle .fx-dot {
+  background: rgb(var(--fx-mint));
+  box-shadow: 0 0 0 3px rgba(var(--fx-mint), .22), 0 0 10px rgba(var(--fx-mint), .8);
+}
+
+@media (max-width: 640px) {
+  .fx-toggle { left: 12px; bottom: 12px; padding: 8px 12px 8px 10px; font-size: 12px; }
+  .fx-aurora i { width: 95vmax; height: 95vmax; }
+}
+
+@media print {
+  .fx-aurora, .fx-particles, .fx-spotlight, .fx-toggle { display: none !important; }
+}
